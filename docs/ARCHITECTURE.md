@@ -1,3 +1,5 @@
+> The sections below describe the normal baseline. The completed ABE design is documented in PROJECT-REPORT.md and PRESENTATION-GUIDE.md.
+
 # Understand the implementation
 
 ## Phase 1: scenario and access rules

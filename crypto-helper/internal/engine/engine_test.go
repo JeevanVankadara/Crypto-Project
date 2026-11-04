@@ -1,0 +1,15 @@
+package engine
+import("testing";"bytes";"encoding/json")
+func fixture(t *testing.T)(Public,Master){t.Helper();v,e:=Execute(Request{Op:"setup"});if e!=nil{t.Fatal(e)};m:=v.(map[string]any);return m["public"].(Public),m["master"].(Master)}
+func issue(t *testing.T,p Public,m Master,attrs ...string)UserKey{t.Helper();v,e:=Execute(Request{Op:"keygen",Public:p,Master:m,Attributes:attrs});if e!=nil{t.Fatal(e)};return v.(UserKey)}
+func encrypt(t *testing.T,p Public)Envelope{t.Helper();v,e:=Execute(Request{Op:"encrypt",Public:p,Policy:"student_23cs101 OR (role_faculty AND dept_cse)",FileID:"test-file",Filename:"grades.pdf",Data:[]byte("private grades")});if e!=nil{t.Fatal(e)};return v.(Envelope)}
+func TestActualAttributeDecryption(t *testing.T){p,m:=fixture(t);env:=encrypt(t,p)
+ for _,attrs:=range [][]string{{"student_23cs101"},{"role_faculty","dept_cse"}} {k:=issue(t,p,m,attrs...);v,e:=Execute(Request{Op:"decrypt",Public:p,Key:k,Envelope:env});if e!=nil||!bytes.Equal(v.(map[string]any)["data"].([]byte),[]byte("private grades")){t.Fatalf("authorized decryption failed: %v",e)}}
+ for _,attrs:=range [][]string{{"student_23cs102"},{"role_faculty","dept_ece"},{"dept_cse"}} {k:=issue(t,p,m,attrs...);if _,e:=Execute(Request{Op:"decrypt",Public:p,Key:k,Envelope:env});e==nil{t.Fatal("unauthorized key decrypted")}}
+}
+func TestTamperingAndRenamedAttributes(t *testing.T){p,m:=fixture(t);env:=encrypt(t,p);k:=issue(t,p,m,"student_23cs101")
+ raw,_:=json.Marshal(env);for _,what:=range []string{"ciphertext","policy","fileId","filename","capsule"}{var bad Envelope;json.Unmarshal(raw,&bad);switch what{case "ciphertext":bad.Ciphertext[0]^=1;case "policy":bad.Header.Policy="student_23cs101";case "fileId":bad.Header.FileID="other";case "filename":bad.Header.Filename="changed.pdf";case "capsule":bad.Header.Capsule.Sym[0]^=1};if _,e:=Execute(Request{Op:"decrypt",Public:p,Key:k,Envelope:bad});e==nil{t.Fatal("accepted modification",what)}}
+ forged:=issue(t,p,m,"student_23cs102");forged.Attributes[0]="student_23cs101";if _,e:=Execute(Request{Op:"decrypt",Public:p,Key:forged,Envelope:env});e==nil{t.Fatal("renamed attribute decrypted")}
+}
+func TestKeysCannotSimplyBeCombined(t *testing.T){p,m:=fixture(t);env:=encrypt(t,p);a:=issue(t,p,m,"role_faculty");b:=issue(t,p,m,"dept_cse");a.Attributes=append(a.Attributes,b.Attributes...);a.K=append(a.K,b.K...);if _,e:=Execute(Request{Op:"decrypt",Public:p,Key:a,Envelope:env});e==nil{t.Fatal("independently randomized key components combined successfully")}}
+func TestWrongAuthorityAndMalformedPackages(t *testing.T){p,m:=fixture(t);env:=encrypt(t,p);p2,m2:=fixture(t);k:=issue(t,p2,m2,"student_23cs101");if _,e:=Execute(Request{Op:"decrypt",Public:p,Key:k,Envelope:env});e==nil{t.Fatal("wrong authority key accepted")};k=issue(t,p,m,"student_23cs101");env.Header.Capsule.C0[0]=[]byte{1};if _,e:=Execute(Request{Op:"decrypt",Public:p,Key:k,Envelope:env});e==nil{t.Fatal("malformed point accepted")};if _,e:=Execute(Request{Op:"encrypt",Public:p,Policy:"",FileID:"x"});e==nil{t.Fatal("empty policy accepted")}}

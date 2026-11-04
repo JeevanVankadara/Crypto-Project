@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Academic Vault · Attribute-based encryption</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/abe/workspace.css" />
+    <script src="/abe/workspace.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-icon">AV</span>Academic Vault</a>
+      <nav class="mode-nav" aria-label="Approaches">
+        <a href="/">Normal approach</a><a href="/abe.html" aria-current="page">Our ABE approach</a
+        ><a href="/comparison.html">Results & presentation</a>
+      </nav>
+    </header>
+    <main class="abe-content">
+      <div class="page-intro">
+        <div>
+          <div class="eyebrow">OUR APPROACH · REAL CP-ABE</div>
+          <h1>Keys decide who can decrypt.</h1>
+          <p class="muted">
+            Grade sheets are encrypted before upload and opened locally with an issued attribute
+            key.
+          </p>
+        </div>
+        <div>
+          <p id="identity">Checking your session…</p>
+          <a href="/" class="button quiet">Switch account</a>
+        </div>
+      </div>
+      <p id="notice" class="message" role="status" hidden></p>
+      <section class="panel key-panel">
+        <div>
+          <span class="eyebrow">YOUR PRIVATE ATTRIBUTE KEY</span>
+          <h2>Load your issued key</h2>
+          <p class="muted small">
+            Choose the key file given to you by the administrator. It stays in this browser session.
+          </p>
+          <p id="key-status" class="key-status">No key loaded</p>
+        </div>
+        <div>
+          <label for="key-file">Attribute key (.json)</label
+          ><input type="file" id="key-file" accept=".json" /><button
+            id="clear-key"
+            type="button"
+            class="button quiet"
+          >
+            Forget key
+          </button>
+        </div>
+      </section>
+      <div class="abe-columns">
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <h2>ABE grade sheets</h2>
+              <p class="muted small">
+                The server stores ciphertext. Decryption happens in your browser.
+              </p>
+            </div>
+            <button id="refresh" class="button quiet">Refresh</button>
+          </div>
+          <div id="records" class="abe-records"></div>
+        </section>
+        <section class="panel upload-panel" id="faculty-panel" hidden>
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">FACULTY UPLOAD</span>
+              <h2>Encrypt a grade sheet</h2>
+            </div>
+          </div>
+          <form id="abe-upload">
+            <label for="student">Student</label
+            ><select id="student" required>
+              <option value="">Choose a student</option></select
+            ><label for="title">Record title</label
+            ><input
+              id="title"
+              required
+              maxlength="100"
+              placeholder="Semester 5 grade sheet"
+            /><label for="semester">Semester</label
+            ><select id="semester" required>
+              <option value="5">5</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option></select
+            ><label for="pdf-file">Grade-sheet PDF</label
+            ><input id="pdf-file" type="file" accept=".pdf,application/pdf" required />
+            <p id="policy" class="policy-box">Choose a student to see the encryption policy.</p>
+            <button type="submit" class="button primary full" id="encrypt-button">
+              Encrypt locally & upload
+            </button>
+            <p class="muted small upload-help">
+              Encryption uses the public key. Your private key is needed only for decryption.
+            </p>
+          </form>
+        </section>
+      </div>
+      <section class="panel access-test">
+        <div>
+          <span class="eyebrow">PROVE THE DIFFERENCE</span>
+          <h2>Try a copied file ID</h2>
+          <p class="muted small">
+            Any signed-in demo account can fetch this encrypted package. Only a matching attribute
+            key can open its PDF.
+          </p>
+        </div>
+        <form id="try-id">
+          <label class="sr-only" for="file-id">Encrypted grade-sheet ID</label
+          ><input id="file-id" placeholder="Paste an ABE file ID" required /><button
+            type="submit"
+            class="button secondary"
+          >
+            Fetch & decrypt locally
+          </button>
+        </form>
+      </section>
+      <section class="panel offline-panel">
+        <span class="eyebrow">COPIED CIPHERTEXT TEST</span>
+        <h2>Open a package from your computer</h2>
+        <p class="muted small">
+          Choose a saved .abe.json file. The package and your key are processed locally without
+          uploading either.
+        </p>
+        <form id="offline-form">
+          <label for="package-file">Encrypted package</label
+          ><input id="package-file" type="file" accept=".json" required /><button
+            type="submit"
+            class="button secondary"
+          >
+            Decrypt selected package
+          </button>
+        </form>
+      </section>
+      <footer class="workspace-footer">
+        <span>FAME CP-ABE + AES-256-GCM · Synthetic academic records</span
+        ><span>Trusted authority issues keys; storage holds encrypted files.</span>
+      </footer>
+    </main>
+  </body>
+</html>

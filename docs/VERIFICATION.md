@@ -1,41 +1,13 @@
-# Verification performed
+# Verification
 
-The implementation was checked against a real local MongoDB Community instance. No in-memory database substitute was used.
+Verified on 5 November 2026 with a real local MongoDB instance.
 
-## Automated checks
+- `npm.cmd test`: 17 reported tests passed, zero failures or skipped tests. Includes actual Node-hosted WASM ABE calls and Express/MongoDB integration.
+- Go engine: five tests passed during the ABE build, covering round trips, policy denial, tampering, edited/mixed keys, authority mismatch and serialization.
+- Browser: uploaded the synthetic Student A PDF through real browser encryption; Student B key failed to decrypt it; Student A key succeeded. Screenshot: `screenshots/abe-success.jpg`.
+- Comparison: actual measured JSON loaded in the results page with timing and storage tables.
+- Baseline: existing login, upload, access denial, storage and restart tests continue to pass.
 
-`npm.cmd test` passed all 13 reported tests, with no failures or skipped tests. The suite includes:
+The browser test changed keys while retaining the faculty login to isolate the cryptographic decision. Cross-account ciphertext retrieval and wrong-key rejection are also covered by the integration test.
 
-- Correct file encryption/decryption and a different nonce for repeated encryption.
-- Rejection of modified ciphertext, a wrong key, and a swapped file identity.
-- Rejection of anonymous downloads, missing CSRF tokens, incorrect passwords, and object-valued login input.
-- Ignoring a forged role/student ID supplied at login.
-- Filtering lists by student ownership and faculty department.
-- Exact original PDF bytes returned to the owner and permitted faculty.
-- Denial of copied file IDs for the wrong student or faculty department.
-- Faculty upload persistence in MongoDB and encrypted local storage.
-- Denial of student uploads, cross-department uploads, non-PDF files, and files over 5 MB.
-- Tampered-file rejection without releasing a PDF.
-- Rejection of an unrelated request origin and invalidation of logged-out sessions.
-- Persistence of files, keys, and sessions after restarting Express.
-
-Tests use a uniquely named `academic_sharing_test_*` database and a temporary storage directory. The demo database is preserved.
-
-## Manual browser checks
-
-- CSE faculty signed in and saw the seeded grade sheets.
-- Uploaded a fictional PDF as `Browser demo grade sheet`; it appeared in the list.
-- Student B saw only their own sheet.
-- Student B requested Student A's copied file ID and received an access denial.
-- The denial appeared in Student B's activity log.
-- Student B downloaded their own PDF successfully.
-- Reviewed desktop and phone-sized layouts.
-- Rendered and inspected the generated one-page sample grade sheet.
-
-Re-running `npm.cmd run seed` preserved the four demo accounts and three existing records (two seeded sheets and the browser-uploaded example). `npm.cmd run inspect` confirmed ciphertext on disk and metadata in MongoDB without exposing secrets.
-
-The portable MongoDB stop/start helpers were also exercised. All four accounts and three records survived a full database-process restart.
-
-File storage was subsequently moved into the server project under `server-data/encrypted-files` and `server-data/sample-grade-sheets`. The matching encryption key and MongoDB engine files retain their existing AppData locations.
-
-The saved [denied-access screenshot](screenshots/denied-access.jpg) shows an actual browser check. These checks verify the phase-2 baseline; they do not evaluate ABE or claim production readiness.
+Benchmark method and measured output are in `results/MEASURED-RESULTS.md`. These tests support the demonstrated behaviors; they are not a cryptographic audit, security proof or production certification.

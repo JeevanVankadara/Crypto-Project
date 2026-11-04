@@ -1,0 +1,161 @@
+{
+  "architecture": "wasm",
+  "measuredAt": "2026-11-04T19:14:46Z",
+  "method": "Both algorithms measured in the same Go WebAssembly runtime hosted in Node.js. Baseline is AES-256-GCM with an already-held server key; ABE is FAME protecting a fresh AES-256-GCM key. Timings exclude disk, MongoDB, network, helper startup and outer JSON encoding. These are crypto-core comparisons, not website response times. Seven repetitions after two warmups; synthetic random payloads.",
+  "os": "js",
+  "repetitions": 7,
+  "rows": [
+    {
+      "abeDecrypt": {
+        "meanMs": 232.54827885714286,
+        "medianMs": 232.153856,
+        "minMs": 202.154752,
+        "maxMs": 274.077184
+      },
+      "abeEncrypt": {
+        "meanMs": 394.5788708571428,
+        "medianMs": 389.810176,
+        "minMs": 336.466688,
+        "maxMs": 440.947968
+      },
+      "abeStoredBytes": 3672,
+      "baselineDecrypt": {
+        "meanMs": 0.05763657142857143,
+        "medianMs": 0.056064,
+        "minMs": 0.048384,
+        "maxMs": 0.076288
+      },
+      "baselineEncrypt": {
+        "meanMs": 0.12664685714285714,
+        "medianMs": 0.12288,
+        "minMs": 0.106752,
+        "maxMs": 0.16256
+      },
+      "baselineStoredBytes": 1483,
+      "inputBytes": 1024,
+      "policyLeaves": 3
+    },
+    {
+      "abeDecrypt": {
+        "meanMs": 169.20608914285714,
+        "medianMs": 164.506624,
+        "minMs": 145.539584,
+        "maxMs": 194.63552
+      },
+      "abeEncrypt": {
+        "meanMs": 274.24471771428574,
+        "medianMs": 276.32256,
+        "minMs": 241.198592,
+        "maxMs": 317.385472
+      },
+      "abeStoredBytes": 138840,
+      "baselineDecrypt": {
+        "meanMs": 3.9404617142857146,
+        "medianMs": 3.751936,
+        "minMs": 2.972928,
+        "maxMs": 6.84544
+      },
+      "baselineEncrypt": {
+        "meanMs": 4.094573714285714,
+        "medianMs": 3.576832,
+        "minMs": 3.099648,
+        "maxMs": 6.95168
+      },
+      "baselineStoredBytes": 136651,
+      "inputBytes": 102400,
+      "policyLeaves": 3
+    },
+    {
+      "abeDecrypt": {
+        "meanMs": 195.23046399999998,
+        "medianMs": 194.731776,
+        "minMs": 187.38048,
+        "maxMs": 213.548032
+      },
+      "abeEncrypt": {
+        "meanMs": 304.5559954285714,
+        "medianMs": 303.185664,
+        "minMs": 289.622016,
+        "maxMs": 329.60768
+      },
+      "abeStoredBytes": 1400408,
+      "baselineDecrypt": {
+        "meanMs": 35.48328228571428,
+        "medianMs": 34.203392,
+        "minMs": 33.133824,
+        "maxMs": 44.28928
+      },
+      "baselineEncrypt": {
+        "meanMs": 34.871552,
+        "medianMs": 34.953216,
+        "minMs": 32.808192,
+        "maxMs": 36.48768
+      },
+      "baselineStoredBytes": 1398219,
+      "inputBytes": 1048576,
+      "policyLeaves": 3
+    },
+    {
+      "abeDecrypt": {
+        "meanMs": 173.34740114285714,
+        "medianMs": 171.425024,
+        "minMs": 135.027712,
+        "maxMs": 215.92064
+      },
+      "abeEncrypt": {
+        "meanMs": 630.1300662857142,
+        "medianMs": 618.084096,
+        "minMs": 499.980288,
+        "maxMs": 784.153344
+      },
+      "abeStoredBytes": 4252,
+      "baselineDecrypt": {
+        "meanMs": 0.041215999999999996,
+        "medianMs": 0.040704,
+        "minMs": 0.031744,
+        "maxMs": 0.063232
+      },
+      "baselineEncrypt": {
+        "meanMs": 0.10452114285714285,
+        "medianMs": 0.098304,
+        "minMs": 0.08064,
+        "maxMs": 0.16384
+      },
+      "baselineStoredBytes": 1483,
+      "inputBytes": 1024,
+      "policyLeaves": 5
+    },
+    {
+      "abeDecrypt": {
+        "meanMs": 155.63776000000001,
+        "medianMs": 150.56384,
+        "minMs": 144.7616,
+        "maxMs": 178.394368
+      },
+      "abeEncrypt": {
+        "meanMs": 1497.9145874285716,
+        "medianMs": 1450.49344,
+        "minMs": 1425.110272,
+        "maxMs": 1623.230976
+      },
+      "abeStoredBytes": 5412,
+      "baselineDecrypt": {
+        "meanMs": 0.034048,
+        "medianMs": 0.033792,
+        "minMs": 0.030976,
+        "maxMs": 0.036864
+      },
+      "baselineEncrypt": {
+        "meanMs": 0.09896228571428571,
+        "medianMs": 0.093184,
+        "minMs": 0.08704,
+        "maxMs": 0.127488
+      },
+      "baselineStoredBytes": 1483,
+      "inputBytes": 1024,
+      "policyLeaves": 9
+    }
+  ],
+  "runtime": "go1.27.3",
+  "warmups": 2
+}

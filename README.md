@@ -1,10 +1,10 @@
 # Secure Academic Data Sharing Using Attribute-Based Encryption
 
-**Implemented: phases 1 and 2 — the grade-sheet scenario and the server-controlled baseline.**
+**Implemented: baseline, real browser CP-ABE, comparison experiments, and demonstration/report documentation.**
 
 The app is called **Academic Vault**. Faculty can upload individual grade-sheet PDFs. Students download only their own sheets; faculty download sheets within their department. Express checks every request, encrypts stored PDFs with AES-256-GCM, and decrypts approved downloads.
 
-**ABE is not implemented yet.** The server holds the AES key and can read every file. Roles and student IDs are database fields used by server code, not cryptographic attribute keys.
+The normal approach keeps its AES key on the server. The ABE approach encrypts in the browser with a fresh AES key protected by FAME CP-ABE. Issued attribute keys control local decryption. Start with [the faculty demo guide](docs/PRESENTATION-GUIDE.md) and [the report](docs/PROJECT-REPORT.md).
 
 ## Stack
 
@@ -24,7 +24,7 @@ npm.cmd run db:start
 npm.cmd start
 ```
 
-Open **http://127.0.0.1:3000** and keep the terminal open. `Ctrl+C` stops Express. MongoDB continues running until `npm.cmd run db:stop`; files persist after stopping.
+Open **http://127.0.0.1:3000** and keep the terminal open. `Ctrl+C` stops Express. Run `db:start` again if MongoDB stops with the terminal; files persist after stopping.
 
 Dependencies, MongoDB, demo accounts, and two sample records were set up during implementation. On another computer, follow the fresh setup below.
 
@@ -37,6 +37,10 @@ npm.cmd ci
 npm.cmd run db:install
 npm.cmd run db:start
 npm.cmd run seed
+npm.cmd run abe:install
+npm.cmd run abe:build
+npm.cmd run abe:setup
+npm.cmd run benchmark
 npm.cmd start
 ```
 
@@ -91,7 +95,7 @@ C:\Users\jeeva\AppData\Local\SecureAcademicSharing\
   tools\                   Portable MongoDB installation
 ```
 
-The database is **`academic_sharing_baseline`** at **`mongodb://127.0.0.1:27017`**. Collections: `users`, `gradesheets`, `auditevents`, `sessions`. Grades/PDF contents are stored in encrypted files, not in these collections. Metadata is not ABE-encrypted.
+The database is **`academic_sharing_baseline`** at **`mongodb://127.0.0.1:27017`**. Collections: `users`, `gradesheets`, `abegradesheets`, `auditevents`, `sessions`. Grades/PDF contents are stored in encrypted files, not in these collections. Metadata is not ABE-encrypted.
 
 Keep the AppData `server-secrets/secrets.json`: it is needed to decrypt existing files. The application refuses to silently replace a missing key when encrypted records exist. `server-data/` is ignored by Git and is not served as a public static folder. Downloads still require authorization.
 
@@ -135,7 +139,23 @@ Seeding is repeatable. It does not reset existing passwords or remove records. T
 - Server checks protect direct download requests; modifying the interface or supplying a forged role does not grant access.
 - The server has one AES key, with a fresh nonce per file. A compromised server/key can expose all files. A changed trusted database record can also affect permissions.
 - MongoDB metadata and sessions are readable by a local database administrator. This loopback-only demo has no MongoDB authentication.
-- Authorized users can retain downloaded PDFs. This phase has no revocation, ABE, registration, key-issuing authority, or cloud deployment.
+- Authorized users can retain downloaded PDFs. There is no revocation, self-registration, or cloud deployment. ABE key issuance is a separate administrator command.
 - PDF validation checks size, MIME type, and header/footer. It is not a full PDF parser or malware scanner.
 
-The full project still needs real ABE, comparison experiments, and the final report required by the faculty instructions.
+The full ABE walkthrough is in [HOW-TO-CHECK](docs/HOW-TO-CHECK.md). The implementation is an educational prototype using GoFE research software, not production-grade cryptography.
+
+## ABE workspace and storage
+
+Open http://127.0.0.1:3000/abe.html after signing in. Comparison charts and the presentation outline are at http://127.0.0.1:3000/comparison.html.
+
+- `server-data/abe-encrypted-files/`: encrypted `.abe.json` grade sheets.
+- `server-data/abe/public.json`: public encryption parameters.
+- `%LOCALAPPDATA%/SecureAcademicSharing/abe-user-keys/`: issued demo user keys, loaded manually in the browser.
+- `%LOCALAPPDATA%/SecureAcademicSharing/abe-authority/master.json`: trusted authority secret; never distribute this file.
+- `crypto-helper/`: pinned GoFE FAME implementation wrapper and cryptographic tests.
+- `public/abe/`: browser worker, WebAssembly build, and interface.
+- `docs/results/`: measured CSV and explanation; `public/results/benchmark.json`: raw results.
+
+`abe:build` creates Go WebAssembly modules. The offline authority runs in Node.js using the approved WASM helper; the web server never invokes key issuance. Keep all original keys: replacing them will make old packages inaccessible. Go is needed only to build; Node runs the authority helper.
+
+This one-laptop demo separates roles logically, not by operating-system permissions. The authority, browser/device, and delivered JavaScript must be trusted. A server that replaces client JavaScript could steal imported keys. Metadata is public. Changing an account role does not revoke an already-issued private key.

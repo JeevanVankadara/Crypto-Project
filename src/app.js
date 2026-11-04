@@ -6,6 +6,7 @@ import multer from 'multer';
 import { fileURLToPath } from 'node:url';
 import { authRoutes } from './routes/auth.js';
 import { gradeRoutes } from './routes/grade-sheets.js';
+import { abeRoutes } from './routes/abe.js';
 import { requireCsrf, requireLogin, requireFaculty } from './middleware/auth.js';
 
 export async function createApp(context) {
@@ -17,7 +18,8 @@ export async function createApp(context) {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"],
+          scriptSrc: ["'self'", "'wasm-unsafe-eval'"],
+          workerSrc: ["'self'"],
           styleSrc: ["'self'"],
           imgSrc: ["'self'", 'data:'],
           connectSrc: ["'self'"],
@@ -38,7 +40,7 @@ export async function createApp(context) {
     res.status(connection.readyState === 1 ? 200 : 503).json({
       status: connection.readyState === 1 ? 'ok' : 'unavailable',
       database: 'local MongoDB',
-      phase: 'baseline',
+      phase: 'baseline-and-abe',
     }),
   );
   app.use(express.json({ limit: '16kb' }));
@@ -63,6 +65,7 @@ export async function createApp(context) {
   app.use('/api', requireCsrf);
   app.use('/api/auth', await authRoutes(models));
   app.use('/api/grade-sheets', gradeRoutes(context));
+  app.use('/api/abe', abeRoutes(context));
   app.get('/api/students', requireLogin(models), requireFaculty, async (req, res) => {
     const students = await models.User.find({ role: 'student', department: req.user.department })
       .select('name studentId -_id')

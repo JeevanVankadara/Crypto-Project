@@ -11,3 +11,6 @@ secrets.json
 .runtime/
 tmp/
 server-data/
+.tools/
+public/abe/helper.wasm
+public/abe/wasm_exec.js

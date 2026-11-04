@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Phases 1 and 2: local grade-sheet sharing with server-side access control, Express and MongoDB.",
+  "description": "Academic grade-sheet sharing: Express, local MongoDB, and browser FAME CP-ABE.",
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
+    "abe:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-go.ps1",
+    "abe:build": "node scripts/build-abe.js",
+    "abe:setup": "node --env-file-if-exists=.env scripts/setup-abe.js",
+    "benchmark": "node scripts/benchmark-abe.js",
     "start": "node --env-file-if-exists=.env src/server.js",
     "dev": "node --env-file-if-exists=.env --watch src/server.js",
     "seed": "node --env-file-if-exists=.env scripts/seed.js",
@@ -16,7 +20,7 @@
     "db:start": "node --env-file-if-exists=.env scripts/local-mongodb.js start",
     "db:stop": "node --env-file-if-exists=.env scripts/local-mongodb.js stop",
     "test": "node --test --test-concurrency=1 tests/*.test.js",
-    "format": "prettier --write \"src/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" \"public/*.{html,css,js}\" package.json"
+    "format": "prettier --write \"src/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" \"public/*.{html,css,js}\" package.json \"public/abe/{workspace,comparison,worker}.js\" \"public/abe/workspace.css\""
   },
   "dependencies": {
     "connect-mongo": "^6.0.0",

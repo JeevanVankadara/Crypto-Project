@@ -38,7 +38,11 @@ export function createModels(connection) {
       actorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
       actorName: { type: String, required: true },
       department: { type: String, required: true },
-      action: { type: String, enum: ['login', 'logout', 'upload', 'download'], required: true },
+      action: {
+        type: String,
+        enum: ['login', 'logout', 'upload', 'download', 'abe-upload', 'abe-download'],
+        required: true,
+      },
       outcome: { type: String, enum: ['allowed', 'denied', 'failed'], required: true },
       fileId: { type: String, default: null },
       detail: { type: String, required: true },
@@ -51,6 +55,7 @@ export function createModels(connection) {
   return {
     User: connection.model('User', userSchema),
     GradeSheet: connection.model('GradeSheet', gradeSchema),
+    ABEGradeSheet: connection.model('ABEGradeSheet', gradeSchema.clone()),
     AuditEvent: connection.model('AuditEvent', auditSchema),
   };
 }

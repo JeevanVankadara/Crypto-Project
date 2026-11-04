@@ -14,7 +14,7 @@ try {
     console.log(`Academic Vault: http://${config.host}:${server.address().port}`);
     console.log(`Database: ${connection.name} (local MongoDB)`);
     console.log(`Runtime folder: ${config.dataDir}`);
-    console.log('Phase 2 baseline: the server controls access and holds the AES key.');
+    console.log('Normal and ABE approaches available; ABE decryption happens in the browser.');
   });
   server.on('error', async (error) => {
     console.error(

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Academic Vault · Results and presentation</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/abe/workspace.css" />
+    <script src="/abe/comparison.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-icon">AV</span>Academic Vault</a>
+      <nav class="mode-nav">
+        <a href="/">Normal approach</a><a href="/abe.html">Our ABE approach</a
+        ><a href="/comparison.html" aria-current="page">Results & presentation</a>
+      </nav>
+    </header>
+    <main class="abe-content">
+      <div class="page-intro">
+        <div>
+          <div class="eyebrow">PROJECT EVALUATION</div>
+          <h1>Same grade sheet. Different control.</h1>
+          <p class="muted">
+            An implemented comparison of server-controlled sharing and cryptographic attribute
+            policies.
+          </p>
+        </div>
+      </div>
+      <section class="panel comparison-panel">
+        <h2>Explain the difference</h2>
+        <div class="table-scroll">
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Normal approach</th>
+                <th>Our ABE approach</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Who decides access?</td>
+                <td>Express checks the user's saved role and student ID.</td>
+                <td>The issued attribute key must satisfy the encrypted file's policy.</td>
+              </tr>
+              <tr>
+                <td>Where is the file key?</td>
+                <td>The server holds its AES key.</td>
+                <td>A fresh file key is protected by CP-ABE inside each package.</td>
+              </tr>
+              <tr>
+                <td>Where is decryption?</td>
+                <td>On the server before download.</td>
+                <td>In the recipient's browser using their private key.</td>
+              </tr>
+              <tr>
+                <td>Does copying ciphertext reveal grades?</td>
+                <td>No, ciphertext alone is insufficient. The server-held key can decrypt it.</td>
+                <td>No. The copied package still needs a matching attribute key.</td>
+              </tr>
+              <tr>
+                <td>What is the cost?</td>
+                <td>Simple key management and fast AES operations.</td>
+                <td>Additional encryption/decryption time, larger packages, and key issuance.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel comparison-panel">
+        <h2>Measured results</h2>
+        <p id="measurement" class="subtle">Loading measurements…</p>
+        <p class="subtle">
+          Both algorithms measured in the same Go WebAssembly runtime hosted in Node.js, excluding
+          network, database, disk and helper startup. These numbers compare the cryptographic core;
+          browser speed can differ.
+        </p>
+        <label for="metric">Compare</label
+        ><select id="metric">
+          <option value="Encrypt">Encryption time</option>
+          <option value="Decrypt">Decryption time</option>
+        </select>
+        <div class="chart-legend">
+          <span>Gray: normal AES-GCM</span><span>Green: FAME + AES-GCM</span>
+        </div>
+        <div id="chart"></div>
+        <div class="table-scroll">
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>Input</th>
+                <th>Policy attributes</th>
+                <th>Normal encrypt</th>
+                <th>ABE encrypt</th>
+                <th>Normal decrypt</th>
+                <th>ABE decrypt</th>
+                <th>Stored bytes: normal / ABE</th>
+              </tr>
+            </thead>
+            <tbody id="results"></tbody>
+          </table>
+        </div>
+        <p class="subtle">
+          The goal is stronger control of decryption when encrypted files are copied, with
+          measurable overhead. Faster encryption is not claimed.
+        </p>
+      </section>
+      <section class="panel comparison-panel">
+        <h2>Five-minute faculty demonstration</h2>
+        <ol class="demo-script">
+          <li>
+            <strong>Problem:</strong> “A student's grade sheet should be readable only by that
+            student or authorized faculty.”
+          </li>
+          <li>
+            <strong>Normal approach:</strong> show Student A downloading their sheet and Student B
+            denied by the server.
+          </li>
+          <li>
+            <strong>Our policy:</strong> show
+            <code>student_23cs101 OR (role_faculty AND dept_cse)</code>.
+          </li>
+          <li>
+            <strong>Real encryption:</strong> as faculty, encrypt a PDF in the ABE workspace and
+            save its file ID.
+          </li>
+          <li>
+            <strong>Copied-file test:</strong> load Student B's issued key and try that ID. The
+            package arrives, but local decryption fails. Load Student A's key and it succeeds.
+          </li>
+          <li>
+            <strong>Results:</strong> show the measurements above and explain the cost of ABE.
+          </li>
+          <li>
+            <strong>Limits:</strong> the authority and recipient device must be trusted. This demo
+            uses one laptop. A malicious server that replaces the web application's JavaScript could
+            steal an imported key. Separate client distribution and operating-system isolation are
+            future improvements.
+          </li>
+        </ol>
+      </section>
+      <section class="panel comparison-panel">
+        <h2>What we contributed</h2>
+        <p>
+          We applied an existing CP-ABE scheme to individual grade-sheet sharing, integrated it with
+          local MongoDB and Express, moved encryption/decryption into the browser, separated
+          authority key issuance from storage, and tested the same access scenario under both
+          approaches.
+        </p>
+        <p>
+          This is an application-level improvement, not a new cryptographic algorithm. Revocation of
+          previously issued keys and previously downloaded plaintext remains future work. GoFE/FAME
+          is research software; this prototype is for synthetic academic demonstrations.
+        </p>
+        <p>
+          <a href="https://github.com/fentec-project/gofe"
+            >GoFE implementation and research references</a
+          >
+          · <a href="/results/benchmark.json">Download measured JSON</a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,3 +1,5 @@
+> The sections below describe the normal baseline. The completed ABE design is documented in PROJECT-REPORT.md and PRESENTATION-GUIDE.md.
+
 # Database and storage
 
 Default connection: `mongodb://127.0.0.1:27017/academic_sharing_baseline`. This is local MongoDB; the configuration rejects remote database hosts.
