@@ -5,8 +5,8 @@ import { connectDatabase } from '../src/db.js';
 import { runCrypto } from './abe-helper.js';
 import { DEMO_USERS } from './demo-data.js';
 const config = readConfig();
-const authorityDir = path.join(config.mongoRuntimeDir, 'abe-authority');
-const userDir = path.join(config.mongoRuntimeDir, 'abe-user-keys');
+const authorityDir = config.abeAuthorityDir;
+const userDir = config.abeUserKeysDir;
 const publicDir = path.join(config.dataDir, 'abe');
 await mkdir(authorityDir, { recursive: true, mode: 0o700 });
 await mkdir(userDir, { recursive: true, mode: 0o700 });
@@ -64,7 +64,7 @@ try {
   }
   console.log(`User keys for manual distribution: ${userDir}`);
   console.log(
-    'Authority master key is kept outside the repository and is never served by Express.',
+    'Authority master key is in ignored server-data/abe-authority and is never served by Express.',
   );
 } finally {
   await connection.close();

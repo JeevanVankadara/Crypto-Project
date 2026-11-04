@@ -7,9 +7,12 @@ export function readConfig(overrides = {}) {
   const dataDir = path.resolve(
     process.env.APP_DATA_DIR || fileURLToPath(new URL('../server-data/', import.meta.url)),
   );
-  const mongoRuntimeDir = path.join(
-    process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share'),
-    'SecureAcademicSharing',
+  const mongoRuntimeDir = path.resolve(
+    process.env.APP_RUNTIME_DIR ||
+      path.join(
+        process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share'),
+        'SecureAcademicSharing',
+      ),
   );
   const config = {
     port: Number(process.env.PORT || 3000),
@@ -17,7 +20,7 @@ export function readConfig(overrides = {}) {
     mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/academic_sharing_baseline',
     dataDir,
     mongoRuntimeDir,
-    secretsDir: path.join(mongoRuntimeDir, 'server-secrets'),
+    secretsDir: path.join(overrides.dataDir || dataDir, 'server-secrets'),
     ...overrides,
   };
   // This project intentionally uses local MongoDB, never Atlas or another remote host.
@@ -35,5 +38,7 @@ export function readConfig(overrides = {}) {
     storageDir: path.join(config.dataDir, 'encrypted-files'),
     secretsFile: path.join(config.secretsDir, 'secrets.json'),
     sampleDir: path.join(config.dataDir, 'sample-grade-sheets'),
+    abeAuthorityDir: path.join(config.dataDir, 'abe-authority'),
+    abeUserKeysDir: path.join(config.dataDir, 'abe-user-keys'),
   };
 }

@@ -37,7 +37,7 @@ flowchart LR
 
 The main stack remains Node.js, Express, local MongoDB, and HTML/CSS/JavaScript. The cryptography helper uses the pinned GoFE FAME implementation compiled to WebAssembly. Node.js hosts the offline authority module. A separate browser module exposes only encrypt/decrypt operations. Authority setup and key issuance are not web API endpoints.
 
-The authority verifies the fixed demo profiles before issuing keys. Student A has `role_student`, `dept_cse`, `student_23cs101`; Student B has a different student attribute. CSE faculty has `role_faculty` and `dept_cse`. Issued keys remain outside the server project in local AppData and are imported manually into browser memory. They are forgotten on navigation and are not uploaded by the interface.
+The authority verifies the fixed demo profiles before issuing keys. Student A has `role_student`, `dept_cse`, `student_23cs101`; Student B has a different student attribute. CSE faculty has `role_faculty` and `dept_cse`. Issued keys remain in the ignored server-data/abe-user-keys folder and are imported manually into browser memory. They are forgotten on navigation and are not uploaded by the interface.
 
 Server ABE files are `server-data/abe-encrypted-files/<UUID>.abe.json`; public parameters are `server-data/abe/public.json`. MongoDB database `academic_sharing_baseline` contains users, ordinary grade sheets, ABE grade-sheet metadata, audit events and sessions. `abegradesheets` stores file ID, owner, department, semester, title, filename, size and uploader. It contains no plaintext PDF or ABE secret key. Policies and metadata are visible.
 
@@ -67,7 +67,7 @@ The security demonstration succeeds: a copied encrypted package remains unreadab
 
 The implementation meets the prototype objective: an ordinary baseline and a real CP-ABE workflow operate on the same grade-sheet scenario, with tested authorized/unauthorized behavior and reproducible measurements.
 
-This is one-laptop logical separation. The current OS account can access AppData secrets; the storage server is not isolated from an administrator of that machine. The authority, recipient device and browser-delivered application code must be trusted. A malicious server replacing JavaScript could steal imported keys. GoFE is research software, and no production-grade or 128-bit-security claim is made. Metadata is not encrypted. Possession of a shared/stolen valid user key grants its decryption capabilities. ABE access changes do not revoke old issued keys or previously downloaded packages. Plaintext already downloaded cannot be recalled.
+This is one-laptop logical separation. The current OS account can access project secrets; the storage server is not isolated from an administrator of that machine. The authority, recipient device and browser-delivered application code must be trusted. A malicious server replacing JavaScript could steal imported keys. GoFE is research software, and no production-grade or 128-bit-security claim is made. Metadata is not encrypted. Possession of a shared/stolen valid user key grants its decryption capabilities. ABE access changes do not revoke old issued keys or previously downloaded packages. Plaintext already downloaded cannot be recalled.
 
 Future work includes reviewed cryptographic dependencies, separately distributed trusted clients, OS/service isolation, authenticated deployment, secure key distribution and storage, key revocation/re-encryption, richer policies, larger repeated experiments, and administrative interfaces.
 

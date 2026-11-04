@@ -10,7 +10,8 @@ try {
   connection = database.connection;
   const secrets = await loadSecrets(config, database.models);
   const app = await createApp({ ...database, config, secrets });
-  const server = app.listen(config.port, config.host, () => {
+  const server = app.listen(config.port, config.host);
+  server.once('listening', () => {
     console.log(`Academic Vault: http://${config.host}:${server.address().port}`);
     console.log(`Database: ${connection.name} (local MongoDB)`);
     console.log(`Runtime folder: ${config.dataDir}`);
@@ -39,7 +40,9 @@ try {
   process.on('SIGTERM', stop);
 } catch (error) {
   console.error(`Could not start: ${error.message}`);
-  console.error('Try: npm run db:start, then npm run seed, then npm start.');
+  console.error(
+    'For a database connection error, run npm run db:start. For a missing key, restore the original key at the reported path; seeding cannot recover it.',
+  );
   if (connection) await connection.close();
   process.exitCode = 1;
 }

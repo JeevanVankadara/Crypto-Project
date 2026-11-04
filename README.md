@@ -85,11 +85,18 @@ C:\Users\jeeva\OneDrive\Desktop\Crypto-project\Crypto-Project\server-data\
   sample-grade-sheets\      Readable fictional PDFs for testing uploads
 ```
 
-The encryption key and MongoDB engine files remain in their existing local location:
+Secrets are stored inside the project (ignored by Git and never served by Express):
+
+```text
+server-data/server-secrets/secrets.json
+server-data/abe-authority/master.json
+server-data/abe-user-keys/
+```
+
+MongoDB engine files remain in their local location:
 
 ```text
 C:\Users\jeeva\AppData\Local\SecureAcademicSharing\
-  server-secrets\           AES key and session-signing secret
   mongodb-data\            MongoDB's own storage files
   mongodb.log              Database process log
   tools\                   Portable MongoDB installation
@@ -97,7 +104,7 @@ C:\Users\jeeva\AppData\Local\SecureAcademicSharing\
 
 The database is **`academic_sharing_baseline`** at **`mongodb://127.0.0.1:27017`**. Collections: `users`, `gradesheets`, `abegradesheets`, `auditevents`, `sessions`. Grades/PDF contents are stored in encrypted files, not in these collections. Metadata is not ABE-encrypted.
 
-Keep the AppData `server-secrets/secrets.json`: it is needed to decrypt existing files. The application refuses to silently replace a missing key when encrypted records exist. `server-data/` is ignored by Git and is not served as a public static folder. Downloads still require authorization.
+Keep the project `server-data/server-secrets/secrets.json`: it is needed to decrypt existing files. The application refuses to silently replace a missing key when encrypted records exist. `server-data/` is ignored by Git and is not served as a public static folder. Downloads still require authorization.
 
 ## File organization
 
@@ -150,8 +157,8 @@ Open http://127.0.0.1:3000/abe.html after signing in. Comparison charts and the 
 
 - `server-data/abe-encrypted-files/`: encrypted `.abe.json` grade sheets.
 - `server-data/abe/public.json`: public encryption parameters.
-- `%LOCALAPPDATA%/SecureAcademicSharing/abe-user-keys/`: issued demo user keys, loaded manually in the browser.
-- `%LOCALAPPDATA%/SecureAcademicSharing/abe-authority/master.json`: trusted authority secret; never distribute this file.
+- `server-data/abe-user-keys/`: issued demo user keys, loaded manually in the browser.
+- `server-data/abe-authority/master.json`: trusted authority secret; never distribute this file.
 - `crypto-helper/`: pinned GoFE FAME implementation wrapper and cryptographic tests.
 - `public/abe/`: browser worker, WebAssembly build, and interface.
 - `docs/results/`: measured CSV and explanation; `public/results/benchmark.json`: raw results.

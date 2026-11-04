@@ -6,7 +6,7 @@ For the complete demonstration, follow [PRESENTATION-GUIDE.md](PRESENTATION-GUID
 2. Open http://127.0.0.1:3000 and sign in as CSE faculty. Password: `DemoGrades!2026`.
 3. Open Our ABE approach. Select Student A, enter a title, select semester 5 and the sample PDF from `server-data/sample-grade-sheets`.
 4. Click Encrypt locally & upload. Expect an encrypted-upload success message and a new record.
-5. Choose `C:\Users\jeeva\AppData\Local\SecureAcademicSharing\abe-user-keys\student-a.key.json` in Attribute key. Click Decrypt PDF. Expect success and a readable PDF download.
+5. Choose `C:\Users\jeeva\OneDrive\Desktop\Crypto-project\Crypto-Project\server-data\abe-user-keys\student-a.key.json` in Attribute key. Click Decrypt PDF. Expect success and a readable PDF download.
 6. Load `student-b.key.json` from the same folder and try that record. Expect decryption failure. Try `faculty-cse.key.json` for success or `faculty-ece.key.json` for failure.
 7. Click Forget key when done. Reloading or leaving the page also forgets the in-memory key.
 8. Open http://127.0.0.1:3000/comparison.html for measured charts and the faculty demonstration outline.
@@ -18,7 +18,7 @@ For the complete demonstration, follow [PRESENTATION-GUIDE.md](PRESENTATION-GUID
 - Sample PDFs: the sibling `sample-grade-sheets` folder. These are intentionally readable fictional examples.
 - MongoDB: `mongodb://127.0.0.1:27017`, database `academic_sharing_baseline`. Inspect `users`, `gradesheets`, `abegradesheets`, `auditevents`, `sessions` in MongoDB Compass.
 - MongoDB physical files: `C:\Users\jeeva\AppData\Local\SecureAcademicSharing\mongodb-data`.
-- Private keys: AppData `SecureAcademicSharing/abe-user-keys`; authority secret: `abe-authority/master.json`. Never put secrets in the publicly served `public` folder.
+- Private keys: project `server-data/abe-user-keys`; authority secret: `server-data/abe-authority/master.json`. Never put secrets in the publicly served `public` folder.
 
 ABE package JSON contains public policy information, encrypted key material and encrypted PDF bytes. It should not contain readable grades. The web server logs ciphertext transfers; it does not know whether local decryption succeeded.
 

@@ -14,7 +14,7 @@ Say: “Student 23CS101 can read this sheet, or someone who is both faculty and 
 1. In the project terminal run `npm.cmd run db:start`, then `npm.cmd start`. Keep the terminal open.
 2. Open http://127.0.0.1:3000. All demo passwords are `DemoGrades!2026`.
 3. Have the sample PDF ready: `server-data/sample-grade-sheets/23CS101-semester-5.pdf` under the project.
-4. Have the issued keys ready in `C:\Users\jeeva\AppData\Local\SecureAcademicSharing\abe-user-keys`.
+4. Have the issued keys ready in `C:\Users\jeeva\OneDrive\Desktop\Crypto-project\Crypto-Project\server-data\abe-user-keys`.
 5. Never show or distribute `abe-authority/master.json`. Use only the user key files in the demo.
 
 ## Demonstration order (5–7 minutes)

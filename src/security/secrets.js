@@ -23,7 +23,7 @@ export async function loadSecrets(config, models) {
     (await readdir(config.storageDir)).some((name) => name.endsWith('.enc'))
   ) {
     throw new Error(
-      'Encrypted grade sheets exist but the server key is missing. Restore server-secrets/secrets.json.',
+      `Encrypted grade sheets exist but the server key is missing at ${config.secretsFile}. Restore the original server-data/server-secrets/secrets.json file.`,
     );
   }
   const value = {
