@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A local academic grade-sheet sharing prototype. Phases 1 and 2: server-controlled access."
+    />
+    <title>Academic Vault · Grade sheets</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div id="login-view" class="login-layout">
+      <section class="welcome-panel">
+        <a class="brand light" href="/" aria-label="Academic Vault home"
+          ><span class="brand-icon">AV</span
+          ><span>Academic Vault<small>ACADEMIC RECORDS, SHARED WITH CARE</small></span></a
+        >
+        <div class="welcome-content">
+          <span class="eyebrow">SECURE ACADEMIC DATA SHARING</span>
+          <h1>The right record.<br />The right person.</h1>
+          <p>A dedicated place to share individual grade sheets with students and faculty.</p>
+          <div
+            class="flow-illustration"
+            aria-label="Faculty uploads a grade sheet; the server checks access; the student downloads it."
+          >
+            <div class="record-card">
+              <span class="record-icon">▤</span>
+              <div>
+                <strong>Semester grade sheet</strong><small>23CS101 · Computer Science</small>
+              </div>
+              <span class="record-check">✓</span>
+            </div>
+            <div class="flow-line"></div>
+            <div class="access-card">
+              <span class="status-dot"></span> Identity checked <span>→</span> Access approved
+            </div>
+          </div>
+          <div class="welcome-note">
+            <span class="phase-label">PHASES 01 + 02</span>
+            <p>
+              Server-controlled baseline. The server checks permissions and holds the encryption
+              key. ABE is the next phase.
+            </p>
+          </div>
+        </div>
+        <span class="welcome-footer">A local project prototype · Fictional academic records</span>
+      </section>
+      <main class="signin-panel">
+        <div class="signin-box">
+          <div class="local-label"><span class="status-dot"></span> LOCAL DEMONSTRATION</div>
+          <h2>Welcome back</h2>
+          <p class="muted">Sign in to your academic workspace.</p>
+          <form id="login-form">
+            <label for="email">Email address</label
+            ><input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="username"
+              placeholder="you@demo.local"
+              required
+              maxlength="150"
+            />
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                maxlength="256"
+              /><button
+                id="toggle-password"
+                type="button"
+                class="password-toggle"
+                aria-label="Show password"
+                aria-pressed="false"
+              >
+                Show
+              </button>
+            </div>
+            <p id="login-error" class="message error" role="alert" hidden></p>
+            <button type="submit" class="button primary full" id="login-button">
+              Sign in <span aria-hidden="true">→</span>
+            </button>
+          </form>
+          <div class="demo-accounts">
+            <div class="divider-label">TRY A DEMO ACCOUNT</div>
+            <p class="muted small">Choose a role to fill in its sign-in details.</p>
+            <div class="account-grid">
+              <button type="button" class="account-option" data-demo="faculty.cse@demo.local">
+                <span class="avatar faculty">MR</span
+                ><span><strong>CSE faculty</strong><small>Dr. Maya Rao</small></span>
+              </button>
+              <button type="button" class="account-option" data-demo="student.a@demo.local">
+                <span class="avatar">AS</span
+                ><span><strong>Student A</strong><small>23CS101 · Aarav</small></span>
+              </button>
+              <button type="button" class="account-option" data-demo="student.b@demo.local">
+                <span class="avatar">MN</span
+                ><span><strong>Student B</strong><small>23CS102 · Meera</small></span>
+              </button>
+              <button type="button" class="account-option" data-demo="faculty.ece@demo.local">
+                <span class="avatar faculty">AD</span
+                ><span><strong>ECE faculty</strong><small>Dr. Arun Das</small></span>
+              </button>
+            </div>
+            <p class="demo-password">Demo password: <code>DemoGrades!2026</code></p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="dashboard-view" class="app-shell" hidden>
+      <aside class="sidebar">
+        <a class="brand" href="/"
+          ><span class="brand-icon">AV</span
+          ><span>Academic Vault<small>GRADE-SHEET WORKSPACE</small></span></a
+        >
+        <div class="sidebar-label">WORKSPACE</div>
+        <nav aria-label="Workspace navigation">
+          <button class="nav-item active" data-tab="records" aria-current="page">
+            <span aria-hidden="true">▤</span> Grade sheets
+          </button>
+          <button class="nav-item" data-tab="activity">
+            <span aria-hidden="true">◷</span> Activity log
+          </button>
+          <button class="nav-item" data-tab="guide">
+            <span aria-hidden="true">ⓘ</span> How it works
+          </button>
+        </nav>
+        <div class="sidebar-note">
+          <span class="phase-label">BASELINE · PHASE 02</span><strong>Server-managed access</strong>
+          <p>Encrypted storage with access decisions made by the server.</p>
+          <span class="next-phase">Attribute-based encryption is next.</span>
+        </div>
+        <div class="sidebar-bottom">
+          <span class="status-dot"></span> Local MongoDB <span id="db-status">Checking…</span>
+        </div>
+      </aside>
+      <div class="workspace">
+        <header class="topbar">
+          <span class="breadcrumb"
+            >Workspace <span>/</span> <strong id="breadcrumb-title">Grade sheets</strong></span
+          >
+          <div class="account-menu">
+            <span id="user-avatar" class="avatar">MR</span>
+            <div><strong id="user-name"></strong><small id="user-role"></small></div>
+            <button id="logout-button" class="button quiet">Sign out</button>
+          </div>
+        </header>
+        <main class="content">
+          <div class="page-intro">
+            <div>
+              <div class="eyebrow">ACADEMIC RECORDS</div>
+              <h1 id="page-title">Grade sheets</h1>
+              <p id="page-subtitle" class="muted"></p>
+            </div>
+            <span class="badge neutral">Synthetic data only</span>
+          </div>
+          <p id="workspace-message" class="message" role="status" aria-live="polite" hidden></p>
+          <section id="records-tab" class="tab-content">
+            <div class="stat-grid">
+              <div class="stat-card">
+                <span>Available grade sheets</span><strong id="sheet-count">0</strong
+                ><small>Records your account can access</small>
+              </div>
+              <div class="stat-card">
+                <span>Your access</span><strong id="access-scope">Department</strong
+                ><small id="access-detail"></small>
+              </div>
+              <div class="stat-card">
+                <span>Stored files</span
+                ><strong class="encryption-label"><span class="status-dot"></span> Encrypted</strong
+                ><small>The server holds the AES key</small>
+              </div>
+            </div>
+            <div class="records-layout" id="records-layout">
+              <section class="panel records-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Your records</h2>
+                    <p class="muted small">Download a sheet or copy its ID for an access test.</p>
+                  </div>
+                  <button id="refresh-button" class="button quiet">↻ Refresh</button>
+                </div>
+                <div class="search-wrap">
+                  <label class="sr-only" for="search">Search available grade sheets</label
+                  ><input type="search" id="search" placeholder="Search by student ID or title…" />
+                </div>
+                <div class="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Grade sheet</th>
+                        <th>Student</th>
+                        <th>Uploaded</th>
+                        <th><span class="sr-only">Actions</span></th>
+                      </tr>
+                    </thead>
+                    <tbody id="sheets-body"></tbody>
+                  </table>
+                </div>
+                <div id="empty-records" class="empty-state" hidden>
+                  <span aria-hidden="true">▤</span>
+                  <h3>No grade sheets here yet</h3>
+                  <p class="muted" id="empty-text">Your available grade sheets will appear here.</p>
+                </div>
+                <div class="panel-footer">Only records permitted for your account are listed.</div>
+              </section>
+              <section id="upload-panel" class="panel upload-panel" hidden>
+                <div class="panel-heading">
+                  <div>
+                    <span class="eyebrow">FACULTY WORKSPACE</span>
+                    <h2>Add a grade sheet</h2>
+                  </div>
+                  <span class="upload-plus" aria-hidden="true">+</span>
+                </div>
+                <form id="upload-form">
+                  <label for="upload-student">Student</label
+                  ><select id="upload-student" name="studentId" required>
+                    <option value="">Choose a student</option>
+                  </select>
+                  <label for="upload-title">Record title</label
+                  ><input
+                    id="upload-title"
+                    name="title"
+                    placeholder="e.g. Semester 5 grade sheet"
+                    maxlength="100"
+                    required
+                  />
+                  <label for="upload-semester">Semester</label
+                  ><select id="upload-semester" name="semester" required>
+                    <option value="">Choose a semester</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                  </select>
+                  <label for="upload-file" class="file-label">Grade-sheet PDF</label>
+                  <div class="file-picker">
+                    <span class="file-picker-icon" aria-hidden="true">↑</span
+                    ><input
+                      id="upload-file"
+                      name="file"
+                      type="file"
+                      accept="application/pdf,.pdf"
+                      required
+                    /><small>One PDF · Up to 5 MB</small>
+                  </div>
+                  <p id="upload-feedback" class="message" role="status" hidden></p>
+                  <button id="upload-button" class="button primary full" type="submit">
+                    Encrypt & upload <span aria-hidden="true">↑</span>
+                  </button>
+                  <p class="muted small upload-help">
+                    Visible to the named student and faculty in your department.
+                  </p>
+                </form>
+              </section>
+            </div>
+            <section class="panel access-test">
+              <div>
+                <span class="eyebrow">DEMONSTRATE ACCESS CONTROL</span>
+                <h2>Try a grade-sheet ID</h2>
+                <p class="muted small">
+                  Paste an ID copied from another account. The server will approve or deny the
+                  download.
+                </p>
+              </div>
+              <form id="access-test-form">
+                <label class="sr-only" for="test-file-id">Grade-sheet file ID</label
+                ><input
+                  id="test-file-id"
+                  placeholder="Paste a grade-sheet file ID"
+                  required
+                /><button class="button secondary" type="submit">Check & download</button>
+              </form>
+              <p id="access-feedback" class="message" role="status" hidden></p>
+            </section>
+          </section>
+          <section id="activity-tab" class="tab-content" hidden>
+            <div class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Recent activity</h2>
+                  <p class="muted small" id="activity-scope">
+                    Sign-ins, uploads, and download decisions.
+                  </p>
+                </div>
+                <button id="refresh-activity" class="button quiet">↻ Refresh</button>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Person / action</th>
+                      <th>Result</th>
+                      <th>Details</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="activity-body"></tbody>
+                </table>
+              </div>
+              <p id="empty-activity" class="empty-state" hidden>No activity yet.</p>
+              <div class="panel-footer">Latest 30 events within your account’s visibility.</div>
+            </div>
+          </section>
+          <section id="guide-tab" class="tab-content" hidden>
+            <div class="panel guide-panel">
+              <span class="eyebrow">UNDERSTAND THE BASELINE</span>
+              <h2>From upload to download</h2>
+              <ol class="guide-steps">
+                <li>
+                  <strong>Faculty uploads a PDF.</strong>
+                  <p>The server checks the faculty account and the student’s department.</p>
+                </li>
+                <li>
+                  <strong>The server encrypts the file.</strong>
+                  <p>
+                    The encrypted PDF is saved on disk. MongoDB stores its student ID, department,
+                    title, and random file ID.
+                  </p>
+                </li>
+                <li>
+                  <strong>A user requests a grade sheet.</strong>
+                  <p>
+                    The server loads the user’s saved identity and checks whether they own the sheet
+                    or teach in its department.
+                  </p>
+                </li>
+                <li>
+                  <strong>The server decrypts approved downloads.</strong>
+                  <p>
+                    A denied request gets an error and no PDF. Every download decision is recorded
+                    in the activity log.
+                  </p>
+                </li>
+              </ol>
+              <div class="baseline-callout">
+                <h3>What this version demonstrates</h3>
+                <p>
+                  Students receive their own records, and faculty receive their department’s
+                  records. The storage files are encrypted, but the server can decrypt every file
+                  because it owns the key.
+                </p>
+                <p>
+                  <strong>Next phase:</strong> use attribute-based encryption to make the decryption
+                  capability depend on a user’s issued attribute key.
+                </p>
+              </div>
+            </div>
+          </section>
+          <footer class="workspace-footer">
+            <span>Secure Academic Data Sharing Using Attribute-Based Encryption</span
+            ><span>Phases 1 & 2 · Local prototype</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
